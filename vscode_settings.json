@@ -1,0 +1,157 @@
+{
+    "editor.minimap.enabled": false,
+    "editor.lineNumbers": "off",
+
+    // システムのclipboardにコピー
+    "vim.useSystemClipboard":true,
+    // 検索に:を入れる
+    "vim.cmdLineInitialColon": true,
+    "vim.hlsearch": true,
+    // easymotion
+    //"vim.easymotion": true,
+    //"vim.leader": "<space>",
+    // カーソル上にあるワードを"*"で検索
+    "vim.visualstar": true,
+    // 諸々のctrlキーを使った操作が有効になる
+    "vim.useCtrlKeys": true,
+
+    "vim.surround": true,
+
+    // for faster scroll 12.Apr.2020
+    "vim.statusBarColorControl": false,
+    "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+    },
+
+    // vscodeのeditorの設定
+    //----------------------------------------------------------
+    "editor.wordWrap": "on", // tab キーを押すとスペースが挿入されます。
+    "editor.renderWhitespace": "none", // エディターで空白文字を表示する方法を制御します。'none'、'boundary' および 'all' が使用可能です。'boundary' オプションでは、単語間の単一スペースは表示されません。
+    "editor.formatOnSave": false, // 時間のかかるフォーマットだとバグが出るのでfalse
+    "breadcrumbs.enabled": true, //エディターで開くパンくずの設定
+
+        //ワンセット
+    "workbench.editor.showTabs": "multiple",
+    "workbench.editor.enablePreview": true,
+    "workbench.editor.enablePreviewFromQuickOpen": true,
+    // { "key": "cmd+w", "command": "workbench.action.closeeditorsingroup" }
+    // { "key": "ctrl+tab", "command": "workbench.action.openpreviouseditorfromhistory" },
+    // { "key": "ctrl+tab", "command": "workbench.action.quickopennavigatenext", "when": "inquickopen" },
+    //----------------------------------------------------------
+
+    //"workbench.colorTheme": "Monokai",
+    //"workbench.colorTheme": "Monokai Dimmed",
+
+    "files.eol": "\n",
+    "editor.fontFamily": "Monoid, 'Courier New', monospace",
+    "editor.codeLens": false,
+    "editor.fontSize": 15,
+    "files.exclude": {
+        "**/*.meta": true,
+        "**/**/*.meta": true,
+        "**/**/**/*.meta": true,
+        "**/**/**/**/*.meta": true,
+        "**/**/**/**/**/*.meta": true,
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+    },
+
+    "files.autoGuessEncoding": true,
+    "files.autoSave": "afterDelay",
+    "editor.cursorStyle": "line",
+    "editor.cursorBlinking": "solid",
+    "editor.wordSeparators": "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-",
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "git.enableSmartCommit": true,
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.guides.indentation": false,
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "git.openRepositoryInParentFolders": "never",
+    "window.zoomLevel": -1,
+    "extensions.autoUpdate": false,
+    "extensions.autoCheckUpdates": false,
+    "update.showReleaseNotes": false,
+    "update.mode": "none",
+    "workbench.colorTheme": "Visual Studio 2019 Dark",
+    "omnisharp.disableMSBuildDiagnosticWarning": true,
+    "workbench.editorAssociations": {
+        "*.pdf": "default"
+    },
+    "editor.unicodeHighlight.invisibleCharacters": false,
+
+    "accessibility.signals.chatRequestSent": {"sound": "off"},
+    "accessibility.signals.chatResponsePending": {"sound": "off"},
+    "accessibility.signals.clear": {"sound": "off"},
+    "accessibility.signals.lineHasFoldedArea": {"sound": "off"},
+    "accessibility.signals.lineHasInlineSuggestion": {"sound": "off"},
+    "accessibility.signals.noInlayHints": {"sound": "off"},
+    "accessibility.signals.notebookCellCompleted": {"sound": "off"},
+    "accessibility.signals.onDebugBreak": {"sound": "off"},
+    "accessibility.signals.notebookCellFailed": {"sound": "off"},
+    "accessibility.signals.taskCompleted": {"sound": "off"},
+    "accessibility.signals.terminalQuickFix": {"sound": "off"},
+    "accessibility.signals.terminalCommandFailed": {"sound": "off"},
+    "accessibility.signals.terminalBell": {"sound": "off"},
+    "accessibility.signals.taskFailed": {"sound": "off"},
+    "accessibility.signals.lineHasWarning": {"sound": "off"},
+    "accessibility.signals.lineHasError": {"sound": "off"},
+    "accessibility.signals.lineHasBreakpoint": {"sound": "off"},
+    "accessibility.signals.diffLineModified": {"sound": "off"},
+    "accessibility.signals.diffLineInserted": {"sound": "off"},
+    "accessibility.signals.diffLineDeleted": {
+        "sound": "off"
+    },
+    "cmake.configureOnOpen": true,
+    "files.associations": {
+        "*.json": "json"
+    },
+    "cmake.showOptionsMovedNotification": false,
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        },
+        "Ubuntu (WSL)": {
+            "path": "C:\\WINDOWS\\System32\\wsl.exe",
+            "args": [
+                "-d",
+                "Ubuntu"
+            ]
+        },
+        "Ubuntu-24.04 (WSL)": {
+            "path": "C:\\WINDOWS\\System32\\wsl.exe",
+            "args": [
+                "-d",
+                "Ubuntu-24.04"
+            ]
+        }
+    },
+    "php.validate.executablePath": "",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+}
