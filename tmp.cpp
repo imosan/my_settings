@@ -73,3 +73,14 @@ void UScreenshotHelper::RequestScreenshotWithUI(const FString& BaseFileName)
 
     UE_LOG(LogTemp, Log, TEXT("Requested screenshot: %s (including UI)"), *FullPath);
 }
+
+void UMyBlueprintFunctionLibrary::CaptureWithUI()
+{
+    if (GEngine && GEngine->GameViewport)
+    {
+        FHighResScreenshotConfig& HighResScreenshotConfig = GetHighResScreenshotConfig();
+        HighResScreenshotConfig.Filename = TEXT("MyShot.png");
+
+        GEngine->GameViewport->Viewport->TakeHighResScreenShot();
+    }
+}
