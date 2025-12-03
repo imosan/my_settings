@@ -115,3 +115,62 @@ void UMyBlueprintFunctionLibrary::CaptureWithUI()
         UE_LOG(LogTemp, Warning, TEXT("CaptureWithUI: No GameViewport found."));
     }
 }
+
+// MyBlueprintFunctionLibrary.h
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "ImageUtils.h"
+#include "HighResScreenshot.h"
+#include "MyBlueprintFunctionLibrary.generated.h"
+
+UCLASS()
+class YOURPROJECT_API UMyBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+{
+    GENERATED_BODY()
+public:
+    UFUNCTION(BlueprintCallable, Category="Screenshot")
+    static void CaptureWithUI(const FString& Filename);
+};
+
+// MyBlueprintFunctionLibrary.cpp
+#include "MyBlueprintFunctionLibrary.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "Misc/FileHelper.h"
+#include "HAL/PlatformFilemanager.h"
+
+void UMyBlueprintFunctionLibrary::CaptureWithUI(const FString& Filename)
+{
+    if (GEngine && GEngine->GameViewport)
+    {
+        // ビューポート取得
+        FViewport* Viewport = GEngine->GameViewport->Viewport;
+        if (!Viewport)
+            return;
+
+        // ピクセルバッファ作成
+        TArray<FColor> Bitmap;
+        Bitmap.SetNumZeroed(Viewport->GetSizeXY().X * Viewport->GetSizeXY().Y);
+
+        // UI込みでスクリーンを読み込む
+        if (Viewport->ReadPixels(Bitmap))
+        {
+            // 画像反転
+            for (int32 y = 0; y < Viewport->GetSizeXY().Y / 2; ++y)
+            {
+                for (int32 x = 0; x < Viewport->GetSizeXY().X; ++x)
+                {
+                    Bitmap.SwapMemory(x + y * Viewport->GetSizeXY().X, x + (Viewport->GetSizeXY().Y - 1 - y) * Viewport->GetSizeXY().X);
+                }
+            }
+
+            // PNG に保存
+            FIntPoint Size(Viewport->GetSizeXY());
+            FHighResScreenshotConfig& Config = GetHighResScreenshotConfig();
+            Config.Filename = Filename;
+            FFileHelper::CreateBitmap(*Filename, Size.X, Size.Y, Bitmap.GetData());
+        }
+    }
+}
