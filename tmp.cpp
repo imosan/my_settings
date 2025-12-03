@@ -84,3 +84,34 @@ void UMyBlueprintFunctionLibrary::CaptureWithUI()
         GEngine->GameViewport->Viewport->TakeHighResScreenShot();
     }
 }
+
+#include "MyBlueprintFunctionLibrary.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "HighResScreenshot.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+
+void UMyBlueprintFunctionLibrary::CaptureWithUI()
+{
+    // エンジンが生きていて、ビューポートが存在するか確認
+    if (GEngine && GEngine->GameViewport)
+    {
+        // スクリーンショット設定取得
+        FHighResScreenshotConfig& HighResScreenshotConfig = GetHighResScreenshotConfig();
+
+        // Saved/Screenshots/Platform/ に保存される
+        // 例: MyShot.png → WindowsNoEditor/Saved/Screenshots/Windows/MyShot.png
+        HighResScreenshotConfig.Filename = TEXT("MyShot");
+
+        // 高解像度スクリーンショット（UIを含む）
+        // TakeHighResScreenShot() は UI も含めてレンダリング後の最終出力をキャプチャする
+        GEngine->GameViewport->Viewport->TakeHighResScreenShot();
+
+        UE_LOG(LogTemp, Log, TEXT("[CaptureWithUI] Screenshot Requested: %s"), *HighResScreenshotConfig.Filename);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("CaptureWithUI: No GameViewport found."));
+    }
+}
