@@ -174,3 +174,40 @@ void UMyBlueprintFunctionLibrary::CaptureWithUI(const FString& Filename)
         }
     }
 }
+
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "Modules/ModuleManager.h"
+#include "Misc/FileHelper.h"
+
+bool GetPngInfo(const FString& FilePath, int32& OutWidth, int32& OutHeight)
+{
+    OutWidth = 0;
+    OutHeight = 0;
+
+    TArray<uint8> FileData;
+    if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load file: %s"), *FilePath);
+        return false;
+    }
+
+    IImageWrapperModule& ImageWrapperModule =
+        FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+
+    TSharedPtr<IImageWrapper> ImageWrapper =
+        ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+
+    if (!ImageWrapper.IsValid() ||
+        !ImageWrapper->SetCompressed(FileData.GetData(), FileData.Num()))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Not a valid PNG: %s"), *FilePath);
+        return false;
+    }
+
+    OutWidth  = ImageWrapper->GetWidth();
+    OutHeight = ImageWrapper->GetHeight();
+
+    return true;
+}
+
