@@ -1539,3 +1539,30 @@ public class BuildMeshModule : ModuleRules
         );
     }
 }
+
+use std::{env, fs, path::PathBuf};
+
+fn main() {
+    // Cargo が出力する target/{profile} パス
+    let profile = env::var("PROFILE").unwrap(); // debug / release
+    let target_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
+        .join("target")
+        .join(&profile);
+
+    // UE プラグイン側 ThirdParty パス（相対 or 絶対）
+    let ue_third_party = PathBuf::from(
+        "../BuildMeshPlugin/Source/ThirdParty/BuildMeshRust/Lib/Win64"
+    );
+
+    fs::create_dir_all(&ue_third_party).unwrap();
+
+    // ファイル名
+    let lib = "buildmesh.lib";
+    let dll = "buildmesh.dll";
+
+    fs::copy(target_dir.join(lib), ue_third_party.join(lib))
+        .expect("copy .lib failed");
+
+    fs::copy(target_dir.join(dll), ue_third_party.join(dll))
+        .expect("copy .dll failed");
+}
