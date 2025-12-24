@@ -1511,3 +1511,31 @@ free_mesh(
     Data.VertexCount,
     Data.IndexCount
 );
+
+using System.IO;
+using UnrealBuildTool;
+
+public class BuildMeshModule : ModuleRules
+{
+    public BuildMeshModule(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+        string ThirdPartyPath = Path.Combine(ModuleDirectory, "..", "ThirdParty", "RustLib");
+        string LibPath = Path.Combine(ThirdPartyPath, "Lib", "Win64");
+
+        PublicIncludePaths.Add(
+            Path.Combine(ThirdPartyPath, "Include")
+        );
+
+        PublicAdditionalLibraries.Add(
+            Path.Combine(LibPath, "rust_lib.lib")
+        );
+
+        // DLLを実行時にロードさせる
+        RuntimeDependencies.Add(
+            Path.Combine("$(BinaryOutputDir)", "rust_lib.dll"),
+            Path.Combine(ThirdPartyPath, "Lib", "Win64", "rust_lib.dll")
+        );
+    }
+}
