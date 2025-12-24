@@ -1345,3 +1345,169 @@ pub fn parse_url_query_string<'a>(query: &'a str, search_key: &str) -> Option<&'
 
     None
 }
+
+
+struct MeshInternal {
+    positions: Vec<[f32; 3]>,
+    normals: Vec<[f32; 3]>,
+    indices: Vec<u32>,
+}
+
+#[repr(C)]
+pub struct MeshData {
+    pub positions: *const f32,
+    pub normals: *const f32,
+    pub indices: *const u32,
+
+    pub vertex_count: u32,
+    pub index_count: u32,
+}
+
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum LoadError {
+    #[error("io error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("gltf error")]
+    Gltf,
+}
+
+fn load_gltf_mesh(path: &str) -> Result<MeshInternal, LoadError> {
+    let (doc, buffers, _) = gltf::import(path).map_err(|_| LoadError::Gltf)?;
+
+    let mesh = doc.meshes().next().ok_or(LoadError::Gltf)?;
+    let primitive = mesh.primitives().next().ok_or(LoadError::Gltf)?;
+
+    let reader = primitive.reader(|b| Some(&buffers[b.index()]));
+
+    let positions: Vec<[f32; 3]> =
+        reader.read_positions().ok_or(LoadError::Gltf)?.collect();
+
+    let normals: Vec<[f32; 3]> =
+        reader.read_normals().ok_or(LoadError::Gltf)?.collect();
+
+    let indices: Vec<u32> =
+        reader.read_indices().ok_or(LoadError::Gltf)?
+            .into_u32()
+            .collect();
+
+    Ok(MeshInternal {
+        positions,
+        normals,
+        indices,
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn load_mesh(path: *const std::ffi::c_char) -> MeshData {
+    let cstr = unsafe { std::ffi::CStr::from_ptr(path) };
+    let path = cstr.to_str().unwrap();
+
+    let mesh = load_gltf_mesh(path).unwrap();
+
+    let vertex_count = mesh.positions.len() as u32;
+    let index_count = mesh.indices.len() as u32;
+
+    let positions = mesh.positions.as_ptr() as *const f32;
+    let normals = mesh.normals.as_ptr() as *const f32;
+    let indices = mesh.indices.as_ptr();
+
+    std::mem::forget(mesh); // Rust 側で保持
+
+    MeshData {
+        positions,
+        normals,
+        indices,
+        vertex_count,
+        index_count,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn free_mesh(
+    positions: *const f32,
+    normals: *const f32,
+    indices: *const u32,
+    vertex_count: u32,
+    index_count: u32,
+) {
+    unsafe {
+        drop(Vec::from_raw_parts(
+            positions as *mut [f32; 3],
+            vertex_count as usize,
+            vertex_count as usize,
+        ));
+        drop(Vec::from_raw_parts(
+            normals as *mut [f32; 3],
+            vertex_count as usize,
+            vertex_count as usize,
+        ));
+        drop(Vec::from_raw_parts(
+            indices as *mut u32,
+            index_count as usize,
+            index_count as usize,
+        ));
+    }
+}
+
+extern "C" {
+
+struct MeshData
+{
+    const float* Positions;
+    const float* Normals;
+    const uint32* Indices;
+    uint32 VertexCount;
+    uint32 IndexCount;
+};
+
+MeshData load_mesh(const char* path);
+void free_mesh(
+    const float* positions,
+    const float* normals,
+    const uint32* indices,
+    uint32 vertexCount,
+    uint32 indexCount
+);
+}
+
+MeshData Data = load_mesh("D:/test.glb");
+
+TArray<FVector> Vertices;
+TArray<FVector> Normals;
+TArray<int32> Indices;
+
+Vertices.Reserve(Data.VertexCount);
+Normals.Reserve(Data.VertexCount);
+
+for (uint32 i = 0; i < Data.VertexCount; i++)
+{
+    Vertices.Add(FVector(
+        Data.Positions[i * 3 + 0],
+        Data.Positions[i * 3 + 1],
+        Data.Positions[i * 3 + 2]
+    ));
+    Normals.Add(FVector(
+        Data.Normals[i * 3 + 0],
+        Data.Normals[i * 3 + 1],
+        Data.Normals[i * 3 + 2]
+    ));
+}
+
+for (uint32 i = 0; i < Data.IndexCount; i++)
+{
+    Indices.Add(Data.Indices[i]);
+}
+
+// UE メッシュ構築（省略）
+
+// コピー完了後、必ず解放
+free_mesh(
+    Data.Positions,
+    Data.Normals,
+    Data.Indices,
+    Data.VertexCount,
+    Data.IndexCount
+);
